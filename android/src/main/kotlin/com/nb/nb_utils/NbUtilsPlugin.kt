@@ -47,20 +47,22 @@ class NbUtilsPlugin : FlutterPlugin, MethodCallHandler {
         val packageManager = appContext!!.packageManager
         val packageInfo = packageManager.getPackageInfo(appContext!!.packageName, 0)
 
-        var appName = ""
         val applicationInfo = packageInfo.applicationInfo
-        val stringId = applicationInfo.labelRes
-
-        appName = if (stringId == 0) {
-            applicationInfo.nonLocalizedLabel.toString()
+        val appName = if (applicationInfo == null) {
+            ""
         } else {
-            appContext!!.getString(stringId)
+            val stringId = applicationInfo.labelRes
+            if (stringId == 0) {
+                applicationInfo.nonLocalizedLabel?.toString() ?: ""
+            } else {
+                appContext!!.getString(stringId)
+            }
         }
 
         return mapOf(
             "appName" to appName,
             "packageName" to packageInfo.packageName,
-            "versionName" to packageInfo.versionName,
+            "versionName" to (packageInfo.versionName ?: ""),
             "versionCode" to getLongVersionCode(packageInfo).toString(),
             "androidSDKVersion" to Build.VERSION.SDK_INT,
         )
